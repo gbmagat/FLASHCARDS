@@ -1,0 +1,300 @@
+.flashcards {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  min-width: 0;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  color: #211016;
+  font-size: clamp(1.55rem, 3vw, 2.2rem);
+  line-height: 1.1;
+}
+
+.sectionHeader p {
+  margin: 8px 0 0;
+  color: #624c53;
+  line-height: 1.55;
+}
+
+.overline {
+  margin: 0;
+  color: #735c63;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.deckCount {
+  display: grid;
+  min-width: 82px;
+  border: 1px solid #e3d3d8;
+  border-bottom: 3px solid #80001e;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 12px;
+  text-align: center;
+  box-shadow: 0 10px 22px rgba(17, 24, 39, 0.09);
+}
+
+.deckCount strong {
+  color: #211016;
+  font-size: 1.65rem;
+  line-height: 1;
+}
+
+.deckCount span {
+  color: #735c63;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+  border: 1px solid #e3d3d8;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: clamp(16px, 3vw, 24px);
+  box-shadow: 0 16px 32px rgba(17, 24, 39, 0.09);
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.field span {
+  color: #4b232f;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.field input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #dcc8ce;
+  border-radius: 8px;
+  background: #fffafa;
+  color: #211016;
+  padding: 12px 14px;
+  outline: none;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.field input:focus {
+  border-color: #80001e;
+  background: #ffffff;
+}
+
+.field input::placeholder {
+  color: #9b838a;
+}
+
+.primaryButton,
+.secondaryButton,
+.ghostButton {
+  min-height: 46px;
+  border-radius: 8px;
+  font-weight: 900;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease,
+    background 160ms ease;
+}
+
+.primaryButton:focus-visible,
+.secondaryButton:focus-visible,
+.ghostButton:focus-visible {
+  outline: 3px solid rgba(128, 0, 30, 0.24);
+  outline-offset: 2px;
+}
+
+.primaryButton {
+  border: 1px solid #80001e;
+  background: #80001e;
+  color: #ffffff;
+  box-shadow: 0 10px 20px rgba(17, 24, 39, 0.16);
+}
+
+.primaryButton:hover {
+  background: #80001e;
+  transform: translateY(-1px);
+}
+
+.emptyState {
+  display: grid;
+  min-height: 152px;
+  place-items: center;
+  gap: 10px;
+  border: 1px dashed #c9aab3;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 24px;
+  text-align: center;
+}
+
+.emptyIcon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border-radius: 8px;
+  background: #fff4dc;
+  color: #80001e;
+  font-weight: 900;
+}
+
+.emptyState p {
+  margin: 0;
+  color: #624c53;
+  font-weight: 700;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+  min-width: 0;
+}
+
+.flashcard {
+  min-width: 0;
+  min-height: 232px;
+  perspective: 1200px;
+}
+
+.flipSurface {
+  position: relative;
+  width: 100%;
+  min-height: 232px;
+  transform-style: preserve-3d;
+  transition: transform 680ms cubic-bezier(0.2, 0.74, 0.2, 1);
+}
+
+.flipped .flipSurface {
+  transform: rotateY(180deg);
+}
+
+.cardFace {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 20px;
+  min-width: 0;
+  min-height: 232px;
+  border: 1px solid #e3d3d8;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 18px;
+  backface-visibility: hidden;
+  box-shadow: 0 16px 32px rgba(17, 24, 39, 0.1);
+}
+
+.cardBody {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-width: 0;
+}
+
+.cardBack {
+  transform: rotateY(180deg);
+}
+
+.question {
+  margin: 0;
+  color: #211016;
+  font-size: 1.15rem;
+  font-weight: 900;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.answer,
+.hiddenAnswer {
+  margin: 0;
+  border-left: 4px solid #80001e;
+  color: #624c53;
+  line-height: 1.55;
+  padding-left: 12px;
+  overflow-wrap: anywhere;
+}
+
+.hiddenAnswer {
+  border-left-color: #d4ad58;
+  color: #8b737a;
+  font-weight: 700;
+}
+
+.cardActions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  align-self: end;
+}
+
+.secondaryButton {
+  border: 1px solid #80001e;
+  background: #fff3f5;
+  color: #80001e;
+}
+
+.secondaryButton:hover {
+  background: #ffe4ea;
+  transform: translateY(-1px);
+}
+
+.ghostButton {
+  border: 1px solid #e3d3d8;
+  background: #ffffff;
+  color: #624c53;
+}
+
+.ghostButton:hover {
+  border-color: #80001e;
+  color: #80001e;
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flipSurface,
+  .primaryButton,
+  .secondaryButton,
+  .ghostButton {
+    transition: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .sectionHeader {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .deckCount {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    justify-items: center;
+    width: 100%;
+  }
+
+  .cardGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
