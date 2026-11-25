@@ -89,7 +89,6 @@
   background: #fffafa;
   color: #211016;
   padding: 12px 14px;
-  outline: none;
   transition:
     border-color 160ms ease,
     background 160ms ease;
@@ -98,6 +97,11 @@
 .field input:focus {
   border-color: #80001e;
   background: #ffffff;
+}
+
+.field input:focus-visible {
+  outline: 2px solid #80001e;
+  outline-offset: 2px;
 }
 
 .field input::placeholder {
@@ -120,7 +124,7 @@
 .primaryButton:focus-visible,
 .secondaryButton:focus-visible,
 .ghostButton:focus-visible {
-  outline: 3px solid rgba(128, 0, 30, 0.24);
+  outline: 3px solid #80001e;
   outline-offset: 2px;
 }
 

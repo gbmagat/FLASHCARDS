@@ -172,7 +172,7 @@
 }
 
 .topicButton:focus-visible {
-  outline: 3px solid rgba(128, 0, 30, 0.24);
+  outline: 3px solid #80001e;
   outline-offset: 2px;
 }
 
