@@ -10,5 +10,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './test/setup.js',
+    // Only the project's own tests, never stray files in tool folders.
+    include: ['test/**/*.test.{js,jsx}'],
   },
 })
