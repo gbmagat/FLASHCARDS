@@ -100,6 +100,22 @@ describe('flashcard deck', () => {
     expect(screen.queryByText('Now you see me')).not.toBeInTheDocument()
   })
 
+  it('keeps one Flip and one Delete per card, with focus on a visible button after flipping', async () => {
+    const user = renderDeck()
+    await addCard(user, 'Keyboard flip', 'Still focused')
+    const card = cards()[0]
+    const flip = within(card).getByRole('button', { name: 'Flip' })
+    expect(flip).toHaveAttribute('aria-pressed', 'false')
+
+    flip.focus()
+    await user.keyboard('{Enter}')
+
+    expect(flip).toHaveAttribute('aria-pressed', 'true')
+    expect(flip).toHaveFocus()
+    expect(card.querySelectorAll('button')).toHaveLength(2)
+    expect(card.querySelectorAll('[aria-hidden="true"] button')).toHaveLength(0)
+  })
+
   it('flips each card on its own', async () => {
     const user = renderDeck()
     await addCard(user, 'Card A', 'Answer A')

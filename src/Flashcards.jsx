@@ -98,30 +98,10 @@ export default function Flashcards() {
                 key={card.id}
               >
                 <div className={styles.flipSurface}>
-                  <div
-                    className={styles.cardFace}
-                    aria-hidden={isFlipped}
-                  >
+                  <div className={styles.cardFace} aria-hidden={isFlipped}>
                     <div className={styles.cardBody}>
                       <p className={styles.question}>{card.question}</p>
                       <p className={styles.hiddenAnswer}>Answer hidden</p>
-                    </div>
-
-                    <div className={styles.cardActions}>
-                      <button
-                        className={styles.secondaryButton}
-                        type="button"
-                        onClick={() => toggleCard(card.id)}
-                      >
-                        Flip
-                      </button>
-                      <button
-                        className={styles.ghostButton}
-                        type="button"
-                        onClick={() => deleteCard(card.id)}
-                      >
-                        Delete
-                      </button>
                     </div>
                   </div>
 
@@ -131,25 +111,28 @@ export default function Flashcards() {
                         <p className={styles.question}>{card.question}</p>
                         <p className={styles.answer}>{card.answer}</p>
                       </div>
-
-                      <div className={styles.cardActions}>
-                        <button
-                          className={styles.secondaryButton}
-                          type="button"
-                          onClick={() => toggleCard(card.id)}
-                        >
-                          Flip
-                        </button>
-                        <button
-                          className={styles.ghostButton}
-                          type="button"
-                          onClick={() => deleteCard(card.id)}
-                        >
-                          Delete
-                        </button>
-                      </div>
                     </div>
                   )}
+                </div>
+
+                {/* One set of controls per card, outside the faces, so focus
+                    never lands on a face that has turned away. */}
+                <div className={styles.cardActions}>
+                  <button
+                    className={styles.secondaryButton}
+                    type="button"
+                    aria-pressed={isFlipped}
+                    onClick={() => toggleCard(card.id)}
+                  >
+                    Flip
+                  </button>
+                  <button
+                    className={styles.ghostButton}
+                    type="button"
+                    onClick={() => deleteCard(card.id)}
+                  >
+                    Delete
+                  </button>
                 </div>
               </article>
             )

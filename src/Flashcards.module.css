@@ -173,15 +173,17 @@
 }
 
 .flashcard {
+  display: grid;
+  align-content: start;
+  gap: 10px;
   min-width: 0;
-  min-height: 232px;
   perspective: 1200px;
 }
 
 .flipSurface {
   position: relative;
   width: 100%;
-  min-height: 232px;
+  min-height: 176px;
   transform-style: preserve-3d;
   transition: transform 680ms cubic-bezier(0.2, 0.74, 0.2, 1);
 }
@@ -194,10 +196,8 @@
   position: absolute;
   inset: 0;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: 20px;
   min-width: 0;
-  min-height: 232px;
+  min-height: 176px;
   border: 1px solid #e3d3d8;
   border-radius: 8px;
   background: #ffffff;
@@ -246,7 +246,6 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 10px;
-  align-self: end;
 }
 
 .secondaryButton {
