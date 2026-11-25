@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styles from './Flashcards.module.css'
 
 function countLabel(count) {
@@ -12,6 +12,20 @@ export default function Flashcards() {
   const [flippedCards, setFlippedCards] = useState({})
   // Read out by screen readers after each add or delete (role="status").
   const [announcement, setAnnouncement] = useState('')
+
+  const questionInput = useRef(null)
+  const flipButtons = useRef(new Map())
+  // Where focus goes once a deleted card has left the page: a card id, or
+  // 'question' for the form when the deck is empty.
+  const focusAfterDelete = useRef(null)
+
+  useEffect(() => {
+    const target = focusAfterDelete.current
+    if (!target) return
+    focusAfterDelete.current = null
+    const element = target === 'question' ? questionInput.current : flipButtons.current.get(target)
+    element?.focus()
+  }, [cards])
 
   function handleSubmit(event) {
     event.preventDefault()
@@ -31,6 +45,8 @@ export default function Flashcards() {
     setQuestion('')
     setAnswer('')
     setAnnouncement(`Card added. ${countLabel(cards.length + 1)} in deck.`)
+    // Ready for the next card straight away.
+    questionInput.current?.focus()
   }
 
   function toggleCard(cardId) {
@@ -41,6 +57,12 @@ export default function Flashcards() {
   }
 
   function deleteCard(cardId) {
+    // The focused Delete button is about to disappear, so pick the card that
+    // takes its place (or the one before it) to receive focus instead.
+    const index = cards.findIndex((card) => card.id === cardId)
+    const neighbour = cards[index + 1] ?? cards[index - 1]
+    focusAfterDelete.current = neighbour ? neighbour.id : 'question'
+
     setCards((currentCards) => currentCards.filter((card) => card.id !== cardId))
     setFlippedCards((currentCards) => {
       const nextCards = { ...currentCards }
@@ -69,6 +91,7 @@ export default function Flashcards() {
         <label className={styles.field}>
           <span>Question</span>
           <input
+            ref={questionInput}
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
             placeholder="Question"
@@ -135,6 +158,10 @@ export default function Flashcards() {
                     never lands on a face that has turned away. */}
                 <div className={styles.cardActions}>
                   <button
+                    ref={(element) => {
+                      if (element) flipButtons.current.set(card.id, element)
+                      else flipButtons.current.delete(card.id)
+                    }}
                     className={styles.secondaryButton}
                     type="button"
                     aria-pressed={isFlipped}

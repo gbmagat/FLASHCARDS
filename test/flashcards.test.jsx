@@ -118,6 +118,31 @@ describe('flashcard deck', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Card deleted. 1 card in deck.')
   })
 
+  it('returns focus to the Question field after adding a card', async () => {
+    const user = renderDeck()
+    await addCard(user, 'Next one', 'Ready')
+    expect(screen.getByPlaceholderText('Question')).toHaveFocus()
+  })
+
+  it('moves focus to a neighbouring card after a delete, then to the form when the deck is empty', async () => {
+    const user = renderDeck()
+    await addCard(user, 'Card A', 'Answer A')
+    await addCard(user, 'Card B', 'Answer B')
+    await addCard(user, 'Card C', 'Answer C')
+    // Newest first: C, B, A.
+    const flipOf = (question) => within(cardWithQuestion(question)).getByRole('button', { name: 'Flip' })
+    const deleteOf = (question) => within(cardWithQuestion(question)).getByRole('button', { name: 'Delete' })
+
+    await user.click(deleteOf('Card B'))
+    expect(flipOf('Card A')).toHaveFocus() // the card that took its place
+
+    await user.click(deleteOf('Card A'))
+    expect(flipOf('Card C')).toHaveFocus() // no card after it, so the one before
+
+    await user.click(deleteOf('Card C'))
+    expect(screen.getByPlaceholderText('Question')).toHaveFocus()
+  })
+
   it('keeps both faces in place so a card never turns to a blank side', async () => {
     const user = renderDeck()
     await addCard(user, 'Two sides', 'Back side answer')
