@@ -1,0 +1,123 @@
+import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import Flashcards from '../src/Flashcards.jsx'
+
+function renderDeck() {
+  const user = userEvent.setup()
+  render(<Flashcards />)
+  return user
+}
+
+async function fillForm(user, question, answer) {
+  const questionInput = screen.getByPlaceholderText('Question')
+  const answerInput = screen.getByPlaceholderText('Answer')
+  await user.clear(questionInput)
+  await user.clear(answerInput)
+  if (question) await user.type(questionInput, question)
+  if (answer) await user.type(answerInput, answer)
+}
+
+async function addCard(user, question, answer) {
+  await fillForm(user, question, answer)
+  await user.click(screen.getByRole('button', { name: 'Add card' }))
+}
+
+const cards = () => screen.queryAllByTestId('flashcard')
+
+function cardWithQuestion(question) {
+  return cards().find((card) => within(card).queryByText(question))
+}
+
+describe('flashcard deck', () => {
+  it('starts empty', () => {
+    renderDeck()
+    expect(cards()).toHaveLength(0)
+    expect(screen.getByText('Your saved cards will appear here.')).toBeInTheDocument()
+  })
+
+  it('adds a card, shows its question, and clears the form', async () => {
+    const user = renderDeck()
+    await addCard(user, 'What does JSX compile to?', 'React.createElement calls')
+
+    expect(cards()).toHaveLength(1)
+    expect(within(cards()[0]).getByText('What does JSX compile to?')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Question')).toHaveValue('')
+    expect(screen.getByPlaceholderText('Answer')).toHaveValue('')
+  })
+
+  it('adds a card when Enter is pressed in the form', async () => {
+    const user = renderDeck()
+    await fillForm(user, 'Keyboard question', 'Keyboard answer')
+    await user.keyboard('{Enter}')
+    expect(cards()).toHaveLength(1)
+  })
+
+  it('trims spaces around the question and answer', async () => {
+    const user = renderDeck()
+    await addCard(user, '   Padded question   ', '   Padded answer   ')
+
+    await user.click(within(cards()[0]).getByRole('button', { name: 'Flip' }))
+    expect(screen.getByText('Padded answer')).toBeInTheDocument()
+    expect(within(cards()[0]).getAllByText('Padded question').length).toBeGreaterThan(0)
+  })
+
+  it.each([
+    ['both fields are empty', '', ''],
+    ['the answer is empty', 'Only a question', ''],
+    ['the question is empty', '', 'Only an answer'],
+    ['both fields hold only spaces', '   ', '   '],
+  ])('adds nothing when %s', async (_case, question, answer) => {
+    const user = renderDeck()
+    await addCard(user, question, answer)
+    expect(cards()).toHaveLength(0)
+  })
+
+  it('puts the newest card first', async () => {
+    const user = renderDeck()
+    await addCard(user, 'First question', 'First answer')
+    await addCard(user, 'Second question', 'Second answer')
+
+    expect(cards()).toHaveLength(2)
+    expect(cards()[0]).toHaveTextContent('Second question')
+    expect(cards()[1]).toHaveTextContent('First question')
+  })
+
+  it('keeps the answer out of the page until the card is flipped', async () => {
+    const user = renderDeck()
+    await addCard(user, 'Hidden?', 'Revealed answer')
+    expect(screen.queryByText('Revealed answer')).not.toBeInTheDocument()
+
+    await user.click(within(cards()[0]).getByRole('button', { name: 'Flip' }))
+    expect(screen.getByText('Revealed answer')).toBeInTheDocument()
+  })
+
+  it('hides the answer again when the card is flipped back', async () => {
+    const user = renderDeck()
+    await addCard(user, 'Flip twice', 'Now you see me')
+
+    await user.click(within(cards()[0]).getByRole('button', { name: 'Flip' }))
+    await user.click(within(cards()[0]).getByRole('button', { name: 'Flip' }))
+    expect(screen.queryByText('Now you see me')).not.toBeInTheDocument()
+  })
+
+  it('flips each card on its own', async () => {
+    const user = renderDeck()
+    await addCard(user, 'Card A', 'Answer A')
+    await addCard(user, 'Card B', 'Answer B')
+
+    await user.click(within(cardWithQuestion('Card A')).getByRole('button', { name: 'Flip' }))
+    expect(screen.getByText('Answer A')).toBeInTheDocument()
+    expect(screen.queryByText('Answer B')).not.toBeInTheDocument()
+  })
+
+  it('deletes only the card you choose', async () => {
+    const user = renderDeck()
+    await addCard(user, 'Keep me', 'Kept')
+    await addCard(user, 'Delete me', 'Deleted')
+
+    await user.click(within(cardWithQuestion('Delete me')).getByRole('button', { name: 'Delete' }))
+
+    expect(cards()).toHaveLength(1)
+    expect(cards()[0]).toHaveTextContent('Keep me')
+  })
+})
