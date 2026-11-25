@@ -118,6 +118,27 @@ describe('flashcard deck', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Card deleted. 1 card in deck.')
   })
 
+  it('keeps identical cards separate, even when added in the same millisecond', async () => {
+    vi.spyOn(Date, 'now').mockReturnValue(1_700_000_000_000)
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    try {
+      const user = renderDeck()
+      await addCard(user, 'Same question', 'Same answer')
+      await addCard(user, 'Same question', 'Same answer')
+      expect(cards()).toHaveLength(2)
+
+      await user.click(within(cards()[0]).getByRole('button', { name: 'Delete' }))
+
+      // The other card must still be a working card, not a leftover node.
+      expect(cards()).toHaveLength(1)
+      await user.click(within(cards()[0]).getByRole('button', { name: 'Flip' }))
+      expect(screen.getByText('Same answer')).toBeInTheDocument()
+      expect(consoleError.mock.calls.flat().join(' ')).not.toContain('same key')
+    } finally {
+      vi.restoreAllMocks()
+    }
+  })
+
   it('returns focus to the Question field after adding a card', async () => {
     const user = renderDeck()
     await addCard(user, 'Next one', 'Ready')

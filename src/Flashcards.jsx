@@ -5,6 +5,13 @@ function countLabel(count) {
   return `${count} ${count === 1 ? 'card' : 'cards'}`
 }
 
+// A unique id per card, even for identical cards added in the same
+// millisecond. randomUUID needs a secure context (HTTPS or localhost), so
+// fall back to a random string when the page is served over plain HTTP.
+function createCardId() {
+  return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
+
 export default function Flashcards() {
   const [cards, setCards] = useState([])
   const [question, setQuestion] = useState('')
@@ -36,7 +43,7 @@ export default function Flashcards() {
     if (!trimmedQuestion || !trimmedAnswer) return
 
     const newCard = {
-      id: `${Date.now()}-${trimmedQuestion}`,
+      id: createCardId(),
       question: trimmedQuestion,
       answer: trimmedAnswer,
     }
