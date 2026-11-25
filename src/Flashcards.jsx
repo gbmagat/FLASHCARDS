@@ -1,11 +1,17 @@
 import { useState } from 'react'
 import styles from './Flashcards.module.css'
 
+function countLabel(count) {
+  return `${count} ${count === 1 ? 'card' : 'cards'}`
+}
+
 export default function Flashcards() {
   const [cards, setCards] = useState([])
   const [question, setQuestion] = useState('')
   const [answer, setAnswer] = useState('')
   const [flippedCards, setFlippedCards] = useState({})
+  // Read out by screen readers after each add or delete (role="status").
+  const [announcement, setAnnouncement] = useState('')
 
   function handleSubmit(event) {
     event.preventDefault()
@@ -24,6 +30,7 @@ export default function Flashcards() {
     setCards((currentCards) => [newCard, ...currentCards])
     setQuestion('')
     setAnswer('')
+    setAnnouncement(`Card added. ${countLabel(cards.length + 1)} in deck.`)
   }
 
   function toggleCard(cardId) {
@@ -40,6 +47,7 @@ export default function Flashcards() {
       delete nextCards[cardId]
       return nextCards
     })
+    setAnnouncement(`Card deleted. ${countLabel(cards.length - 1)} in deck.`)
   }
 
   return (
@@ -51,7 +59,7 @@ export default function Flashcards() {
           <p>Add a question and answer, then flip a card to study your recall.</p>
         </div>
 
-        <div className={styles.deckCount} aria-label={`${cards.length} cards in deck`}>
+        <div className={styles.deckCount}>
           <strong>{cards.length}</strong>
           <span>{cards.length === 1 ? 'card' : 'cards'}</span>
         </div>
@@ -80,6 +88,11 @@ export default function Flashcards() {
           Add card
         </button>
       </form>
+
+      {/* Always rendered, so screen readers announce each change to it. */}
+      <p className={styles.srOnly} role="status">
+        {announcement}
+      </p>
 
       {cards.length === 0 ? (
         <div className={styles.emptyState}>

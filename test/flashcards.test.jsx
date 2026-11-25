@@ -104,6 +104,20 @@ describe('flashcard deck', () => {
     expect(screen.queryByText('Now you see me')).not.toBeInTheDocument()
   })
 
+  it('announces added and deleted cards to screen readers', async () => {
+    const user = renderDeck()
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
+
+    await addCard(user, 'Announced', 'Out loud')
+    expect(screen.getByRole('status')).toHaveTextContent('Card added. 1 card in deck.')
+
+    await addCard(user, 'Announced again', 'Twice')
+    expect(screen.getByRole('status')).toHaveTextContent('Card added. 2 cards in deck.')
+
+    await user.click(within(cardWithQuestion('Announced')).getByRole('button', { name: 'Delete' }))
+    expect(screen.getByRole('status')).toHaveTextContent('Card deleted. 1 card in deck.')
+  })
+
   it('keeps both faces in place so a card never turns to a blank side', async () => {
     const user = renderDeck()
     await addCard(user, 'Two sides', 'Back side answer')
