@@ -174,14 +174,17 @@
 
 .flashcard {
   display: grid;
-  align-content: start;
+  /* The faces take the free height, so buttons line up along a row. */
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: 10px;
   min-width: 0;
   perspective: 1200px;
 }
 
+/* Both faces share one grid cell, so the card grows to fit the taller
+   one instead of letting long text spill out. */
 .flipSurface {
-  position: relative;
+  display: grid;
   width: 100%;
   min-height: 176px;
   transform-style: preserve-3d;
@@ -193,8 +196,7 @@
 }
 
 .cardFace {
-  position: absolute;
-  inset: 0;
+  grid-area: 1 / 1;
   display: grid;
   min-width: 0;
   min-height: 176px;
