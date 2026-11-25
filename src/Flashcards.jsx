@@ -99,7 +99,7 @@ export default function Flashcards() {
               >
                 <div className={styles.flipSurface}>
                   <div
-                    className={`${styles.cardFace} ${styles.cardFront}`}
+                    className={styles.cardFace}
                     aria-hidden={isFlipped}
                   >
                     <div className={styles.cardBody}>
