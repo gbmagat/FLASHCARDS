@@ -100,19 +100,22 @@ export default function Flashcards() {
                 <div className={styles.flipSurface}>
                   <div className={styles.cardFace} aria-hidden={isFlipped}>
                     <div className={styles.cardBody}>
-                      <p className={styles.question}>{card.question}</p>
+                      <h3 className={styles.question}>{card.question}</h3>
                       <p className={styles.hiddenAnswer}>Answer hidden</p>
                     </div>
                   </div>
 
-                  {isFlipped && (
-                    <div className={`${styles.cardFace} ${styles.cardBack}`}>
-                      <div className={styles.cardBody}>
-                        <p className={styles.question}>{card.question}</p>
-                        <p className={styles.answer}>{card.answer}</p>
-                      </div>
+                  {/* The back stays mounted so the card shows it while turning
+                      back; only the answer enters the page when flipped. */}
+                  <div
+                    className={`${styles.cardFace} ${styles.cardBack}`}
+                    aria-hidden={!isFlipped}
+                  >
+                    <div className={styles.cardBody}>
+                      <h3 className={styles.question}>{card.question}</h3>
+                      {isFlipped && <p className={styles.answer}>{card.answer}</p>}
                     </div>
-                  )}
+                  </div>
                 </div>
 
                 {/* One set of controls per card, outside the faces, so focus

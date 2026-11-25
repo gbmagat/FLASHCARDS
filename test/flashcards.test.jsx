@@ -24,8 +24,10 @@ async function addCard(user, question, answer) {
 
 const cards = () => screen.queryAllByTestId('flashcard')
 
+// Each face shows the question, but only the face toward the reader is
+// exposed, so a card has exactly one question heading at a time.
 function cardWithQuestion(question) {
-  return cards().find((card) => within(card).queryByText(question))
+  return cards().find((card) => within(card).queryByRole('heading', { name: question }))
 }
 
 describe('flashcard deck', () => {
@@ -40,7 +42,9 @@ describe('flashcard deck', () => {
     await addCard(user, 'What does JSX compile to?', 'React.createElement calls')
 
     expect(cards()).toHaveLength(1)
-    expect(within(cards()[0]).getByText('What does JSX compile to?')).toBeInTheDocument()
+    expect(
+      within(cards()[0]).getByRole('heading', { name: 'What does JSX compile to?' }),
+    ).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Question')).toHaveValue('')
     expect(screen.getByPlaceholderText('Answer')).toHaveValue('')
   })
@@ -98,6 +102,22 @@ describe('flashcard deck', () => {
     await user.click(within(cards()[0]).getByRole('button', { name: 'Flip' }))
     await user.click(within(cards()[0]).getByRole('button', { name: 'Flip' }))
     expect(screen.queryByText('Now you see me')).not.toBeInTheDocument()
+  })
+
+  it('keeps both faces in place so a card never turns to a blank side', async () => {
+    const user = renderDeck()
+    await addCard(user, 'Two sides', 'Back side answer')
+    const card = cards()[0]
+    const flip = within(card).getByRole('button', { name: 'Flip' })
+
+    await user.click(flip)
+    await user.click(flip)
+
+    // While the card turns back, both faces still show the question, only
+    // the face toward the reader is exposed, and the answer has left.
+    expect(card.querySelectorAll('h3')).toHaveLength(2)
+    expect(within(card).getAllByRole('heading')).toHaveLength(1)
+    expect(screen.queryByText('Back side answer')).not.toBeInTheDocument()
   })
 
   it('keeps one Flip and one Delete per card, with focus on a visible button after flipping', async () => {
