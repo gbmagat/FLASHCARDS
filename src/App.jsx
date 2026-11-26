@@ -11,13 +11,14 @@ export default function App() {
     <div className={styles.page}>
       <header className={styles.topbar}>
         <div className={styles.brandGroup}>
-          <span className={styles.brandMark}>M3</span>
+          <span className={styles.brandMark} aria-hidden="true">
+            CC
+          </span>
           <div>
-            <p className={styles.overline}>FLASHCARDS</p>
+            <p className={styles.overline}>React study guide</p>
             <h1>Course Companion</h1>
           </div>
         </div>
-
       </header>
 
       <main className={styles.workspace}>
