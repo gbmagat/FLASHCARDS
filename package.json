@@ -1,7 +1,8 @@
 {
-  "name": "module-3-activity-1-course-companion",
+  "name": "course-companion",
   "version": "1.0.0",
   "private": true,
+  "description": "A React study app: a reader for four React lessons and a flashcard deck you can add to, flip, and keep in your browser.",
   "type": "module",
   "scripts": {
     "dev": "vite",
