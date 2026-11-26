@@ -110,6 +110,19 @@ describe('flashcard deck', () => {
     expect(cards()).toHaveLength(1)
   })
 
+  it('keeps the deck after the page is reloaded, but not the flipped state', async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<Flashcards />)
+    await addCard(user, 'Survives a reload?', 'Yes, from localStorage')
+    await user.click(within(cards()[0]).getByRole('button', { name: 'Flip' }))
+    unmount()
+
+    render(<Flashcards />)
+    expect(cards()).toHaveLength(1)
+    expect(within(cards()[0]).getByRole('heading', { name: 'Survives a reload?' })).toBeInTheDocument()
+    expect(screen.queryByText('Yes, from localStorage')).not.toBeInTheDocument()
+  })
+
   it('puts the newest card first', async () => {
     const user = renderDeck()
     await addCard(user, 'First question', 'First answer')

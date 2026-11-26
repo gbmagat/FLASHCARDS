@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import { loadDeck, saveDeck } from './deckStorage.js'
 import styles from './Flashcards.module.css'
 
 function countLabel(count) {
@@ -13,7 +14,8 @@ function createCardId() {
 }
 
 export default function Flashcards() {
-  const [cards, setCards] = useState([])
+  // Starts from the deck saved in this browser, if any.
+  const [cards, setCards] = useState(loadDeck)
   const [question, setQuestion] = useState('')
   const [answer, setAnswer] = useState('')
   const [flippedCards, setFlippedCards] = useState({})
@@ -29,6 +31,10 @@ export default function Flashcards() {
   // Where focus goes once a deleted card has left the page: a card id, or
   // 'question' for the form when the deck is empty.
   const focusAfterDelete = useRef(null)
+
+  useEffect(() => {
+    saveDeck(cards)
+  }, [cards])
 
   useEffect(() => {
     const target = focusAfterDelete.current
@@ -100,7 +106,10 @@ export default function Flashcards() {
         <div>
           <p className={styles.overline}>Practice deck</p>
           <h2 id="flashcards-heading">Flashcards</h2>
-          <p>Add a question and answer, then flip a card to study your recall.</p>
+          <p>
+            Add a question and answer, then flip a card to study your recall. Your deck is
+            saved in this browser.
+          </p>
         </div>
 
         <div className={styles.deckCount}>
