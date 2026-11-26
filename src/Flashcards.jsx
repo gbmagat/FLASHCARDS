@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { loadDeck, saveDeck } from './deckStorage.js'
+import { sampleCards } from './sampleCards.js'
 import styles from './Flashcards.module.css'
 
 function countLabel(count) {
@@ -28,18 +29,18 @@ export default function Flashcards() {
   const questionInput = useRef(null)
   const answerInput = useRef(null)
   const flipButtons = useRef(new Map())
-  // Where focus goes once a deleted card has left the page: a card id, or
-  // 'question' for the form when the deck is empty.
-  const focusAfterDelete = useRef(null)
+  // Where focus goes once the deck has re-rendered, after a delete or after
+  // loading the samples: a card id, or 'question' for the form.
+  const pendingFocus = useRef(null)
 
   useEffect(() => {
     saveDeck(cards)
   }, [cards])
 
   useEffect(() => {
-    const target = focusAfterDelete.current
+    const target = pendingFocus.current
     if (!target) return
-    focusAfterDelete.current = null
+    pendingFocus.current = null
     const element = target === 'question' ? questionInput.current : flipButtons.current.get(target)
     element?.focus()
   }, [cards])
@@ -89,7 +90,7 @@ export default function Flashcards() {
     // takes its place (or the one before it) to receive focus instead.
     const index = cards.findIndex((card) => card.id === cardId)
     const neighbour = cards[index + 1] ?? cards[index - 1]
-    focusAfterDelete.current = neighbour ? neighbour.id : 'question'
+    pendingFocus.current = neighbour ? neighbour.id : 'question'
 
     setCards((currentCards) => currentCards.filter((card) => card.id !== cardId))
     setFlippedCards((currentCards) => {
@@ -98,6 +99,14 @@ export default function Flashcards() {
       return nextCards
     })
     setAnnouncement(`Card deleted. ${countLabel(cards.length - 1)} in deck.`)
+  }
+
+  // Offered on an empty deck, so a first visit can go straight to flipping.
+  function loadSampleCards() {
+    const samples = sampleCards.map((card) => ({ ...card, id: createCardId() }))
+    pendingFocus.current = samples[0].id
+    setCards(samples)
+    setAnnouncement(`${samples.length} sample cards added.`)
   }
 
   return (
@@ -167,8 +176,17 @@ export default function Flashcards() {
 
       {cards.length === 0 ? (
         <div className={styles.emptyState}>
-          <span className={styles.emptyIcon}>Q/A</span>
+          <span className={styles.emptyIcon} aria-hidden="true">
+            Q/A
+          </span>
           <p>Your saved cards will appear here.</p>
+          <button
+            className={`${styles.secondaryButton} ${styles.sampleButton}`}
+            type="button"
+            onClick={loadSampleCards}
+          >
+            Load sample cards
+          </button>
         </div>
       ) : (
         <div className={styles.cardGrid}>

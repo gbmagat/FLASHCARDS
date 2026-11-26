@@ -110,6 +110,20 @@ describe('flashcard deck', () => {
     expect(cards()).toHaveLength(1)
   })
 
+  it('offers sample cards on an empty deck, then focuses the first one', async () => {
+    const user = renderDeck()
+    await user.click(screen.getByRole('button', { name: 'Load sample cards' }))
+
+    expect(cards()).toHaveLength(4)
+    expect(screen.getByRole('status')).toHaveTextContent('4 sample cards added.')
+    expect(within(cards()[0]).getByRole('button', { name: 'Flip' })).toHaveFocus()
+    // The offer belongs to the empty deck only.
+    expect(screen.queryByRole('button', { name: 'Load sample cards' })).not.toBeInTheDocument()
+
+    await user.click(within(cards()[0]).getByRole('button', { name: 'Flip' }))
+    expect(within(cards()[0]).getByText(/the page when the data changes/)).toBeInTheDocument()
+  })
+
   it('keeps the deck after the page is reloaded, but not the flipped state', async () => {
     const user = userEvent.setup()
     const { unmount } = render(<Flashcards />)
