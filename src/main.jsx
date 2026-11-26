@@ -2,8 +2,8 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 
-// This is the entry point. It mounts your <App /> into the page. You do not
-// need to change this file; run `npm run dev` and edit the components instead.
+// Entry point: mounts the app into #root in index.html. StrictMode runs
+// extra development-only checks for common React mistakes.
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <App />
