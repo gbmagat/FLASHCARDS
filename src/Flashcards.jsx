@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import styles from './Flashcards.module.css'
 
 function countLabel(count) {
@@ -19,8 +19,12 @@ export default function Flashcards() {
   const [flippedCards, setFlippedCards] = useState({})
   // Read out by screen readers after each add or delete (role="status").
   const [announcement, setAnnouncement] = useState('')
+  // Which field is missing ('question' or 'answer') and what to tell the user.
+  const [formError, setFormError] = useState(null)
+  const errorId = useId()
 
   const questionInput = useRef(null)
+  const answerInput = useRef(null)
   const flipButtons = useRef(new Map())
   // Where focus goes once a deleted card has left the page: a card id, or
   // 'question' for the form when the deck is empty.
@@ -40,8 +44,19 @@ export default function Flashcards() {
     const trimmedQuestion = question.trim()
     const trimmedAnswer = answer.trim()
 
-    if (!trimmedQuestion || !trimmedAnswer) return
+    if (!trimmedQuestion || !trimmedAnswer) {
+      // Say what is missing and put the cursor there, rather than ignoring
+      // the click. Nothing is added.
+      const field = trimmedQuestion ? 'answer' : 'question'
+      const message = !trimmedQuestion && !trimmedAnswer
+        ? 'Add a question and an answer.'
+        : `Add ${field === 'question' ? 'a question' : 'an answer'} for this card.`
+      setFormError({ field, message })
+      ;(field === 'question' ? questionInput : answerInput).current?.focus()
+      return
+    }
 
+    setFormError(null)
     const newCard = {
       id: createCardId(),
       question: trimmedQuestion,
@@ -100,19 +115,36 @@ export default function Flashcards() {
           <input
             ref={questionInput}
             value={question}
-            onChange={(event) => setQuestion(event.target.value)}
+            onChange={(event) => {
+              setQuestion(event.target.value)
+              setFormError(null)
+            }}
             placeholder="Question"
+            aria-invalid={formError?.field === 'question' || undefined}
+            aria-describedby={formError?.field === 'question' ? errorId : undefined}
           />
         </label>
 
         <label className={styles.field}>
           <span>Answer</span>
           <input
+            ref={answerInput}
             value={answer}
-            onChange={(event) => setAnswer(event.target.value)}
+            onChange={(event) => {
+              setAnswer(event.target.value)
+              setFormError(null)
+            }}
             placeholder="Answer"
+            aria-invalid={formError?.field === 'answer' || undefined}
+            aria-describedby={formError?.field === 'answer' ? errorId : undefined}
           />
         </label>
+
+        {formError && (
+          <p id={errorId} className={styles.formError} role="alert">
+            {formError.message}
+          </p>
+        )}
 
         <button className={styles.primaryButton} type="submit">
           Add card

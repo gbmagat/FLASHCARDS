@@ -76,6 +76,40 @@ describe('flashcard deck', () => {
     expect(cards()).toHaveLength(0)
   })
 
+  it('says which field is missing and moves the cursor there', async () => {
+    const user = renderDeck()
+    await addCard(user, 'A question with no answer', '')
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Add an answer for this card.')
+    const answerInput = screen.getByPlaceholderText('Answer')
+    expect(answerInput).toHaveFocus()
+    expect(answerInput).toHaveAttribute('aria-invalid', 'true')
+    expect(answerInput).toHaveAccessibleDescription('Add an answer for this card.')
+    expect(screen.getByPlaceholderText('Question')).not.toHaveAttribute('aria-invalid')
+    expect(cards()).toHaveLength(0)
+  })
+
+  it('asks for both fields when the form is empty', async () => {
+    const user = renderDeck()
+    await user.click(screen.getByRole('button', { name: 'Add card' }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Add a question and an answer.')
+    expect(screen.getByPlaceholderText('Question')).toHaveFocus()
+  })
+
+  it('clears the message once the user starts fixing it', async () => {
+    const user = renderDeck()
+    await addCard(user, 'Half done', '')
+    expect(screen.getByRole('alert')).toBeInTheDocument()
+
+    await user.type(screen.getByPlaceholderText('Answer'), 'Now complete')
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Answer')).not.toHaveAttribute('aria-invalid')
+
+    await user.click(screen.getByRole('button', { name: 'Add card' }))
+    expect(cards()).toHaveLength(1)
+  })
+
   it('puts the newest card first', async () => {
     const user = renderDeck()
     await addCard(user, 'First question', 'First answer')

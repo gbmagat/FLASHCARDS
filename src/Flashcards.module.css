@@ -104,6 +104,20 @@
   outline-offset: 2px;
 }
 
+/* After the focus rules, so a missing field stays red while focused. */
+.field input[aria-invalid='true'] {
+  border-color: #b3261e;
+}
+
+.formError {
+  margin: 0;
+  border-left: 4px solid #b3261e;
+  color: #b3261e;
+  font-weight: 700;
+  line-height: 1.45;
+  padding-left: 12px;
+}
+
 .field input::placeholder {
   color: #735c63;
 }
