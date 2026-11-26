@@ -302,15 +302,17 @@
 
 @media (max-width: 560px) {
   .sectionHeader {
-    align-items: stretch;
+    align-items: flex-start;
     flex-direction: column;
   }
 
+  /* A compact "3 cards" pill rather than a full-width bar. */
   .deckCount {
-    grid-template-columns: auto 1fr;
-    align-items: center;
-    justify-items: center;
-    width: 100%;
+    grid-template-columns: auto auto;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+    padding: 8px 12px;
   }
 
   .cardGrid {

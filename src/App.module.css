@@ -353,9 +353,4 @@
   .readerHeader {
     flex-direction: column;
   }
-
-  .readTime {
-    width: 100%;
-    text-align: center;
-  }
 }
