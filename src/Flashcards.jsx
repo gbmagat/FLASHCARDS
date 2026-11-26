@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { loadDeck, saveDeck } from './deckStorage.js'
+import FlashcardCard from './FlashcardCard.jsx'
 import { sampleCards } from './sampleCards.js'
 import styles from './Flashcards.module.css'
 
@@ -190,62 +191,19 @@ export default function Flashcards() {
         </div>
       ) : (
         <div className={styles.cardGrid}>
-          {cards.map((card) => {
-            const isFlipped = Boolean(flippedCards[card.id])
-
-            return (
-              <article
-                className={`${styles.flashcard} ${isFlipped ? styles.flipped : ''}`}
-                data-testid="flashcard"
-                key={card.id}
-              >
-                <div className={styles.flipSurface}>
-                  <div className={styles.cardFace} aria-hidden={isFlipped}>
-                    <div className={styles.cardBody}>
-                      <h3 className={styles.question}>{card.question}</h3>
-                      <p className={styles.hiddenAnswer}>Answer hidden</p>
-                    </div>
-                  </div>
-
-                  {/* The back stays mounted so the card shows it while turning
-                      back; only the answer enters the page when flipped. */}
-                  <div
-                    className={`${styles.cardFace} ${styles.cardBack}`}
-                    aria-hidden={!isFlipped}
-                  >
-                    <div className={styles.cardBody}>
-                      <h3 className={styles.question}>{card.question}</h3>
-                      {isFlipped && <p className={styles.answer}>{card.answer}</p>}
-                    </div>
-                  </div>
-                </div>
-
-                {/* One set of controls per card, outside the faces, so focus
-                    never lands on a face that has turned away. */}
-                <div className={styles.cardActions}>
-                  <button
-                    ref={(element) => {
-                      if (element) flipButtons.current.set(card.id, element)
-                      else flipButtons.current.delete(card.id)
-                    }}
-                    className={styles.secondaryButton}
-                    type="button"
-                    aria-pressed={isFlipped}
-                    onClick={() => toggleCard(card.id)}
-                  >
-                    Flip
-                  </button>
-                  <button
-                    className={styles.ghostButton}
-                    type="button"
-                    onClick={() => deleteCard(card.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </article>
-            )
-          })}
+          {cards.map((card) => (
+            <FlashcardCard
+              key={card.id}
+              card={card}
+              isFlipped={Boolean(flippedCards[card.id])}
+              onFlip={() => toggleCard(card.id)}
+              onDelete={() => deleteCard(card.id)}
+              flipButtonRef={(element) => {
+                if (element) flipButtons.current.set(card.id, element)
+                else flipButtons.current.delete(card.id)
+              }}
+            />
+          ))}
         </div>
       )}
     </section>
